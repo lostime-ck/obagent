@@ -28,6 +28,7 @@ import (
 	agentlog "github.com/oceanbase/obagent/log"
 	"github.com/oceanbase/obagent/monitor/engine"
 	"github.com/oceanbase/obagent/monitor/message"
+	"github.com/oceanbase/obagent/monitor/plugins/common"
 )
 
 type httpRoute struct {
@@ -77,7 +78,11 @@ func getPipelieGroupReader(ctx context.Context, uri string) (*bytes.Buffer, erro
 
 	}
 
-	msgBuffer, err := transformMetric(ctx, msgs)
+	config := &message.CollectorConfig{
+		ExportTimestamp:    true,
+		TimestampPrecision: common.Millisecond,
+	}
+	msgBuffer, err := transformMetric(ctx, config, msgs)
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("transform message failed")
 	}
@@ -86,8 +91,8 @@ func getPipelieGroupReader(ctx context.Context, uri string) (*bytes.Buffer, erro
 	return buffer, nil
 }
 
-func transformMetric(ctx context.Context, metrics []*message.Message) (*bytes.Buffer, error) {
-	collector := message.NewCollector(nil)
+func transformMetric(ctx context.Context, config *message.CollectorConfig, metrics []*message.Message) (*bytes.Buffer, error) {
+	collector := message.NewCollector(config)
 	collector.Fam = message.CreateMetricFamily(metrics)
 	registry := prometheus.NewRegistry()
 	err := registry.Register(collector)

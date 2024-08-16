@@ -11,6 +11,7 @@ config_mapper:
   mgragent_log_compress: mgragent.log.compress
   monagent_http_port: ocp.agent.monitor.http.port
   monagent_host_ip: monagent.host.ip
+  monitor_user: monagent.ob.monitor.user
   monitor_password: monagent.ob.monitor.password
   sql_port: monagent.ob.sql.port
   rpc_port: monagent.ob.rpc.port
